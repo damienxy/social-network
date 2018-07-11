@@ -1,0 +1,442 @@
+* {
+    font-family: Helvetica;
+    font-weight: 100;
+}
+
+#main {
+    margin: 5vw;
+}
+
+#app {
+}
+
+a {
+    color: black;
+}
+
+.flex {
+    display: flex;
+}
+
+.row {
+    flex-direction: row;
+}
+
+.column {
+    flex-direction: column;
+}
+
+.wrap {
+    flex-wrap: wrap;
+}
+
+.center {
+    justify-content: center;
+}
+
+.header {
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+.menuBar {
+    min-width: 20vw;
+    max-width: 20vw;
+}
+
+.menuHeading {
+    justify-content: flex-start;
+    align-items: center;
+    cursor: pointer;
+}
+
+#app .menuHeading {
+    cursor: default;
+}
+
+.greeting {
+    margin-right: 1vw;
+}
+
+.menuLink,
+button {
+    color: black;
+    background: none;
+    text-decoration: none;
+    margin-bottom: 1vh;
+    margin-top: 1vh;
+    border: none;
+    outline: 0;
+}
+
+.menuLink:hover,
+button:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.menuLink:active,
+button:active {
+    transform: translateX(1px);
+}
+
+button {
+    font-size: 0.9em;
+    background-color: color;
+}
+
+.left {
+    position: relative;
+    margin-right: 5vw;
+    border-right: 1px solid black;
+}
+
+.welcome {
+    border: none;
+}
+
+.right {
+    align-items: flex-end;
+    margin-left: 5vw;
+}
+
+.middleWelcome {
+    min-width: 40vw;
+    max-width: 40vw;
+    text-align: center;
+}
+
+.middleApp {
+    min-width: 60vw;
+    max-width: 60vw;
+    text-align: center;
+}
+
+.inline {
+}
+
+h1 {
+    font-size: 32px;
+}
+
+.plus {
+    font-weight: normal;
+    color: white;
+    margin-left: 0.2em;
+    transition: color 1s;
+}
+
+.instead {
+    color: grey;
+}
+
+.instead:active {
+    color: black;
+    transform: translateX(1px);
+}
+
+.menuBar:hover .plus {
+    color: black;
+    transition: all 1s;
+}
+
+.hiddenLink {
+    text-decoration: none;
+    cursor: pointer;
+    color: black;
+}
+
+.menuBar.welcome h1:hover,
+.form button:hover {
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.menuBar.welcome h1:active,
+.form button:active {
+    text-shadow: none;
+    transform: translateX(1px);
+}
+
+.hiddenLink:hover {
+}
+
+.form {
+    align-items: flex-start;
+}
+
+textarea {
+    font-size: 0.9em;
+    border: 1px solid black;
+    padding: 5px;
+    outline: 0;
+}
+
+input {
+    outline: 0;
+}
+
+.searchInput {
+    margin-top: 1vh;
+}
+
+.chat .textareaPublic {
+    width: 39vw;
+}
+
+.chat .textareaPrivate {
+    width: 28vw;
+}
+
+.chat textarea {
+    height: 5vh;
+    padding: 5px;
+    margin: 5px;
+}
+
+input {
+    width: 13vw;
+    height: 3vh;
+    margin-bottom: 1em;
+    font-size: 0.9em;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+}
+
+input:hover {
+    border: 1px solid black;
+}
+
+.form button {
+    color: black;
+    background-color: white;
+    border: 0;
+    padding: 0;
+    height: 3vh;
+    width: auto;
+    margin-bottom: 1em;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.profile,
+.friends,
+.onlineUsers {
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+.error {
+    color: red;
+    font-size: 0.9em;
+    margin-top: 1em;
+}
+
+.chat .error {
+    margin-top: 0em;
+}
+
+.link {
+    color: green;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+#uploaderContainer {
+    position: absolute;
+    background-color: white;
+    opacity: 0.9;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+}
+
+#uploader {
+    position: fixed;
+    top: 28vh;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40vw;
+    height: 40vh;
+    background-color: lightgrey;
+    opacity: 0.9;
+    z-index: 20;
+}
+
+.logoBig .logoIcon {
+    color: grey;
+    font-size: 30em;
+}
+
+.logoSmall .logoIcon {
+    right: 0;
+    color: grey;
+    font-size: 10vh;
+    background-color: white;
+    transition: color 1s;
+}
+
+.menuBar:hover .logoSmall .logoIcon {
+    color: black;
+    transition: color 1s;
+}
+
+.logoSmall .logoIcon:active {
+    transform: translateX(0.2px);
+}
+
+.messageTitle {
+    cursor: pointer;
+}
+
+.hide {
+    opacity: 0;
+    transition: all 0.5s;
+    z-index: -10;
+}
+
+.show {
+    opacity: 1;
+    transition: all 1s;
+    z-index: 0;
+}
+
+.profilePicSmall {
+    height: 4vh;
+    width: auto;
+    max-width: 1.5vw;
+    object-fit: cover;
+}
+
+.profilePicBig {
+    height: auto;
+    max-height: 50vh;
+    width: 20vw;
+    object-fit: cover;
+    cursor: auto;
+}
+
+.profilePicThumbnail {
+    height: 6em;
+    width: auto;
+    object-fit: cover;
+}
+
+.userDiv {
+    flex-wrap: wrap;
+    margin: 0.4em;
+    margin-bottom: 2em;
+    width: 12em;
+}
+
+.userDiv:hover {
+    opacity: 0.8;
+}
+
+.online {
+    display: inline-block;
+    width: 0.5em;
+    height: 0.5em;
+    margin-right: 0.5em;
+    border: 1px solid #35b535;
+    background-color: #35b535;
+    border-radius: 50%;
+}
+
+.chat {
+    align-items: center;
+}
+
+.chatWindow {
+    overflow: scroll;
+    margin-bottom: 1vh;
+}
+
+.public {
+    width: 40vw;
+    height: 40vh;
+}
+
+.private {
+    width: 30vw;
+    max-height: 55vh;
+}
+
+.message {
+    border: 1px solid black;
+    padding: 5px;
+    margin: 5px;
+}
+
+.messageImage {
+    min-width: 6vw;
+    max-width: 6vw;
+}
+
+.messageInfo {
+    text-align: left;
+}
+
+.messageName {
+    font-weight: 400;
+}
+
+.messageText {
+    display: inline-block;
+}
+
+.messageDate {
+    font-size: 10px;
+}
+
+.bioButtons {
+    justify-content: space-between;
+}
+
+.instruction {
+    cursor: pointer;
+    margin-bottom: 5vh;
+}
+
+.resultLink {
+    align-items: center;
+    text-decoration: none;
+}
+
+.resultLink div {
+    margin-left: 0.5vw;
+}
+
+.highlight {
+    font-weight: 600;
+}
+
+.highlight:active {
+    transform: translateX(2px);
+}
+
+#bioText {
+    width: 400px;
+    height: auto;
+}
+
+#bioInput {
+    width: 400px;
+    height: 100px;
+}
+
+.inputFile {
+    font-size: 1px;
+    display: none;
+    visibility: none;
+}
+
+.label {
+    margin: 0.5em 1em 0.5em 1em;
+    white-space: nowrap;
+    padding: 0.5em;
+    border: 0.1px solid black;
+    cursor: pointer;
+}
