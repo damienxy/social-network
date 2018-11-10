@@ -54,12 +54,16 @@ app.use(
 
 app.use(bodyParser.json());
 
-app.use(
-    cookieSession({
-        secret: secrets.COOKIE_SECRET,
-        maxAge: 1000 * 60 * 60 * 24 * 14
-    })
-);
+const cookieSessionMiddleware = cookieSession({
+    secret: secrets.COOKIE_SECRET,
+    maxAge: 1000 * 60 * 60 * 24 * 14
+});
+
+app.use(cookieSessionMiddleware);
+
+io.use(function(socket, next) {
+    cookieSessionMiddleware(socket.request, socket.request.res, next);
+});
 
 app.use(compression());
 
@@ -87,8 +91,7 @@ if (process.env.NODE_ENV != "production") {
 
 app.post("/register.json", function(req, res) {
     db.hashPassword(req.body.password).then(hash => {
-        db
-            .register(req.body.first, req.body.last, req.body.email, hash)
+        db.register(req.body.first, req.body.last, req.body.email, hash)
             .then(results => {
                 req.session.userId = results.rows[0].id;
             })
@@ -108,8 +111,7 @@ app.post("/register.json", function(req, res) {
 
 app.post("/login.json", function(req, res) {
     let userId;
-    db
-        .getUserByEmail(req.body.email)
+    db.getUserByEmail(req.body.email)
         .then(results => {
             userId = results.rows[0].id;
             return db.checkPassword(
@@ -153,8 +155,7 @@ app.post(
     s3.upload,
     (req, res) => {
         const imgUrl = s3Url + req.file.filename;
-        db
-            .saveProfilePic(imgUrl, req.session.userId)
+        db.saveProfilePic(imgUrl, req.session.userId)
             .then(() => {
                 res.json({
                     profilePic: imgUrl
@@ -180,8 +181,7 @@ app.post(
 );
 
 app.post("/bio.json", (req, res) => {
-    db
-        .saveBio(req.body.bio, req.session.userId)
+    db.saveBio(req.body.bio, req.session.userId)
         .then(() => {
             res.json({
                 success: true
@@ -199,8 +199,7 @@ app.get("/user.json", function(req, res) {
     if (!req.session.userId) {
         res.redirect("welcome");
     } else {
-        db
-            .getUserById(req.session.userId)
+        db.getUserById(req.session.userId)
             .then(results => {
                 if (!results.rows[0].imgurl) {
                     results.rows[0].imgurl = "/img/default.jpg";
@@ -255,8 +254,7 @@ app.get("/user/:id.json", (req, res) => {
 });
 
 app.get("/friendstatus/:id.json", (req, res) => {
-    db
-        .getFriendshipStatus(req.session.userId, req.params.id)
+    db.getFriendshipStatus(req.session.userId, req.params.id)
         .then(results => {
             if (!results.rows[0]) {
                 res.json({
@@ -276,8 +274,7 @@ app.get("/friendstatus/:id.json", (req, res) => {
 });
 
 app.post("/makerequest.json", (req, res) => {
-    db
-        .makeRequest(req.session.userId, req.body.extUser)
+    db.makeRequest(req.session.userId, req.body.extUser)
         .then(({ rows }) => {
             res.json({
                 friendship: rows[0]
@@ -287,8 +284,7 @@ app.post("/makerequest.json", (req, res) => {
 });
 
 app.post("/acceptrequest.json", (req, res) => {
-    db
-        .acceptRequest(req.session.userId, req.body.extUser)
+    db.acceptRequest(req.session.userId, req.body.extUser)
         .then(({ rows }) => {
             res.json({
                 friendship: rows[0]
@@ -298,8 +294,7 @@ app.post("/acceptrequest.json", (req, res) => {
 });
 
 app.post("/nofriendship.json", (req, res) => {
-    db
-        .noFriendship(req.session.userId, req.body.extUser)
+    db.noFriendship(req.session.userId, req.body.extUser)
         .then(() => {
             res.json({
                 friendship: {
@@ -313,8 +308,7 @@ app.post("/nofriendship.json", (req, res) => {
 });
 
 app.get("/getfriendlist.json", (req, res) => {
-    db
-        .getFriendList(req.session.userId)
+    db.getFriendList(req.session.userId)
         .then(({ rows }) => {
             for (var i = 0; i < rows.length; i++) {
                 if (!rows[i].imgurl) {
@@ -329,8 +323,7 @@ app.get("/getfriendlist.json", (req, res) => {
 });
 
 app.get("/getallusers.json", (req, res) => {
-    db
-        .getAllUsers(req.session.userId)
+    db.getAllUsers(req.session.userId)
         .then(({ rows }) => {
             for (var i = 0; i < rows.length; i++) {
                 if (!rows[i].imgurl) {
@@ -345,8 +338,7 @@ app.get("/getallusers.json", (req, res) => {
 });
 
 app.post("/usersearch.json", (req, res) => {
-    db
-        .searchUsers(req.body.query)
+    db.searchUsers(req.body.query)
         .then(({ rows }) => {
             for (var i = 0; i < rows.length; i++) {
                 if (!rows[i].imgurl) {
@@ -392,6 +384,7 @@ server.listen(8080, function() {
 
 // Socket
 let onlineUsers = {};
+console.log(onlineUsers);
 
 io.on("connection", function(socket) {
     if (!socket.request.session || !socket.request.session.userId) {
@@ -402,8 +395,7 @@ io.on("connection", function(socket) {
     const userId = socket.request.session.userId;
     onlineUsers[socketId] = userId;
     var userIds = Object.values(onlineUsers);
-    db
-        .getUsersByIds(Object.values(onlineUsers))
+    db.getUsersByIds(Object.values(onlineUsers))
         .then(({ rows }) => {
             for (var i = 0; i < rows.length; i++) {
                 if (!rows[i].imgurl) {
@@ -419,8 +411,7 @@ io.on("connection", function(socket) {
         .catch(err => console.log("Error in socket.emit onlineUsers ", err));
 
     if (userIds.filter(id => id == userId).length == 1) {
-        db
-            .getUserById(userId)
+        db.getUserById(userId)
             .then(({ rows }) => {
                 if (!rows[0].imgurl) {
                     rows[0].imgurl = "/img/default.jpg";
@@ -433,8 +424,7 @@ io.on("connection", function(socket) {
     }
 
     socket.on("newChatMessage", function(message) {
-        db
-            .saveChatMessage(userId, message)
+        db.saveChatMessage(userId, message)
             .then(result => {
                 return db.getUserById(userId).then(({ rows }) => {
                     if (!rows[0].imgurl) {
@@ -461,8 +451,7 @@ io.on("connection", function(socket) {
             });
     });
 
-    db
-        .getChatMessages()
+    db.getChatMessages()
         .then(({ rows }) => {
             for (var i = 0; i < rows.length; i++) {
                 if (!rows[i].imgurl) {
@@ -474,8 +463,7 @@ io.on("connection", function(socket) {
         .catch(err => console.log("Error in db.getChatMessages", err));
 
     socket.on("getPrivateMessages", function(currentOpp) {
-        db
-            .getPrivateMessages(userId, currentOpp)
+        db.getPrivateMessages(userId, currentOpp)
             .then(({ rows }) => {
                 for (var i = 0; i < rows.length; i++) {
                     if (!rows[i].imgurl) {
@@ -489,8 +477,7 @@ io.on("connection", function(socket) {
     });
 
     socket.on("newPrivateMessage", function(message, currentOpp) {
-        db
-            .savePrivateMessage(userId, currentOpp, message)
+        db.savePrivateMessage(userId, currentOpp, message)
             .then(result => {
                 return db.getUserById(userId).then(({ rows }) => {
                     if (!rows[0].imgurl) {

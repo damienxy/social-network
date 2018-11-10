@@ -5,7 +5,7 @@
         "es6": true,
         "node": true
     },
-    "plugins": ["react"],
+    "plugins": ["react", "react-hooks"],
     "extends": ["eslint:recommended", "plugin:react/recommended"],
     "parserOptions": {
         "sourceType": "module",
@@ -20,6 +20,7 @@
         "no-unexpected-multiline": 0,
         "no-unsafe-finally": 0,
         "react/prop-types": 0,
-        "react/display-name": 0
+        "react/display-name": 0,
+        "react-hooks/rules-of-hooks": "error"
     }
 }

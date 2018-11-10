@@ -1,123 +1,111 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import axios from "./axios";
 
-export default class FriendRequest extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {};
-        this.getButtonText = this.getButtonText.bind(this);
-        this.setFriendState = this.setFriendState.bind(this);
-    }
-    componentDidMount() {
-        const id = this.props.currentOpp;
+export default function FriendRequest(props) {
+    const { currentOpp: id, connect, unfriend } = props;
+    const [friendStatus, setFriendStatus] = useState(null);
+    const [friendReceiver, setFriendReceiver] = useState(null);
+    const [buttonText, setButtonText] = useState(null);
+
+    useEffect(() => {
         axios
             .get(`/friendstatus/${id}.json`)
             .then(({ data }) => {
-                this.setState({
-                    friendStatus: data.friendship.status,
-                    friendReceiver: data.friendship.recipient_id,
-                    friendSender: data.friendship.sender_id
-                });
+                setFriendStatus(data.friendship.status);
+                setFriendReceiver(data.friendship.recipient_id);
             })
             .catch(err =>
                 console.log("Error in axios.get('/friendstatus/id')", err)
             );
-    }
-    getButtonText() {
-        if (!this.state.friendStatus || this.state.friendStatus == 0) {
-            return "Make friend request";
-        } else if (this.state.friendStatus == 1) {
-            if (this.state.friendReceiver == this.props.currentOpp) {
-                return "Cancel friend request";
+    }, []);
+
+    useEffect(
+        () => {
+            getButtonText();
+        },
+        [friendStatus, friendReceiver]
+    );
+
+    const getButtonText = () => {
+        const buttonText =
+            friendStatus === 0
+                ? "Make friend request"
+                : friendStatus === 2
+                    ? "End friendship"
+                    : friendStatus === 1
+                        ? friendReceiver == id
+                            ? "Cancel friend request"
+                            : "Accept friend request"
+                        : "";
+        setButtonText(buttonText);
+    };
+
+    const makeRequest = () => {
+        axios
+            .post("/makerequest.json", {
+                extUser: id
+            })
+            .then(({ data }) => {
+                setFriendStatus(data.friendship.status);
+                setFriendReceiver(id);
+            })
+            .catch(err =>
+                console.log("Error in axios.post('/makerequest') ", err)
+            );
+    };
+
+    const acceptRequest = () => {
+        axios
+            .post("/acceptrequest.json", {
+                extUser: id
+            })
+            .then(({ data }) => {
+                connect();
+                setFriendStatus(data.friendship.status);
+            })
+            .catch(err =>
+                console.log("Error in axios.post('/acceptrequest') ", err)
+            );
+    };
+
+    const noRequest = () => {
+        axios
+            .post("/nofriendship.json", {
+                extUser: id
+            })
+            .then(({ data }) => {
+                setFriendStatus(data.friendship.status);
+            })
+            .catch(err =>
+                console.log(
+                    "Error in axios.post('/nofriendship' to cancel request) ",
+                    err
+                )
+            );
+    };
+
+    const newFriendStatus = () => {
+        if (!friendStatus || friendStatus == 0) {
+            makeRequest();
+        } else if (friendStatus == 1) {
+            if (friendReceiver == id) {
+                noRequest();
             } else {
-                return "Accept friend request";
+                acceptRequest();
             }
-        } else if (this.state.friendStatus == 2) {
-            return "End friendship";
+        } else if (friendStatus == 2) {
+            unfriend();
+            noRequest();
         }
-    }
-    setFriendState() {
-        if (!this.state.friendStatus || this.state.friendStatus == 0) {
-            // Make axios request to set friend status to 1
-            axios
-                .post("/makerequest.json", {
-                    extUser: this.props.currentOpp
-                })
-                .then(({ data }) => {
-                    this.setState({
-                        friendStatus: data.friendship.status,
-                        friendReceiver: this.props.currentOpp
-                    });
-                })
-                .catch(err =>
-                    console.log("Error in axios.post('/makerequest') ", err)
-                );
-        } else if (this.state.friendStatus == 1) {
-            if (this.state.friendReceiver == this.props.currentOpp) {
-                // Make axios request to set friend status to 0
-                axios
-                    .post("/nofriendship.json", {
-                        extUser: this.props.currentOpp
-                    })
-                    .then(({ data }) => {
-                        this.setState({
-                            friendStatus: data.friendship.status
-                        });
-                    })
-                    .catch(err =>
-                        console.log(
-                            "Error in axios.post('/nofriendship' to cancel request) ",
-                            err
-                        )
-                    );
-            } else {
-                // Make axios request to set friend status to 2
-                axios
-                    .post("/acceptrequest.json", {
-                        extUser: this.props.currentOpp
-                    })
-                    .then(({ data }) => {
-                        this.props.connect();
-                        this.setState({
-                            friendStatus: data.friendship.status
-                        });
-                    })
-                    .catch(err =>
-                        console.log(
-                            "Error in axios.post('/acceptrequest') ",
-                            err
-                        )
-                    );
-            }
-        } else if (this.state.friendStatus == 2) {
-            // Make axios request to set friend status to 0
-            axios
-                .post("/nofriendship.json", {
-                    extUser: this.props.currentOpp
-                })
-                .then(({ data }) => {
-                    this.props.unfriend();
-                    this.setState({
-                        friendStatus: data.friendship.status
-                    });
-                })
-                .catch(err =>
-                    console.log(
-                        "Error in axios.post('/nofriendship' to cancel request) ",
-                        err
-                    )
-                );
-        }
-    }
-    render() {
-        return (
-            <button
-                onClick={() => {
-                    this.setFriendState();
-                }}
-            >
-                {this.getButtonText()}
-            </button>
-        );
-    }
+    };
+
+    return (
+        <button
+            onClick={() => {
+                newFriendStatus();
+            }}
+        >
+            {buttonText}
+        </button>
+    );
 }

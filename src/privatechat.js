@@ -26,7 +26,6 @@ class PrivateChat extends React.Component {
             this.chatWindow.scrollHeight - this.chatWindow.clientHeight;
     }
     handleInput(e) {
-        console.log(e.key);
         this[e.target.name] = e.target.value;
     }
     hitEnter(e) {
@@ -35,7 +34,6 @@ class PrivateChat extends React.Component {
         }
     }
     newPrivateMessage() {
-        console.log(this.message);
         this.socket.emit(
             "newPrivateMessage",
             this.message,
